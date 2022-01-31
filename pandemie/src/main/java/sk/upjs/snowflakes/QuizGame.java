@@ -13,33 +13,39 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Kvíz extends Scene {
+public class QuizGame extends Scene {
 
-	private ArrayList<String> otazky = new ArrayList<String>(Arrays.asList("Koľko ľudí sa nakazilo Španielskou chrípkou?",
+	public static final String NAME = "QuizGame";
+
+	/** list og questions **/
+	private ArrayList<String> questions = new ArrayList<String>(Arrays.asList("Koľko ľudí sa nakazilo Španielskou chrípkou?",
 			"Aký národ a v akom storočí začal ako prvý praktizovať karanténu?",
 			"Odkiaľ sa začala šíriť cholera?",
 			"Kto bol prvou zapísanou obeťou španielskej chrípky(H1N1)?",
 			"Aké sú príznaky eboly?"));
 
-	private ArrayList<Integer> odpovede = new ArrayList<Integer>(Arrays.asList(0,1,2,3,0));
+	/** list of correct answears **/
+	private ArrayList<Integer> answears = new ArrayList<Integer>(Arrays.asList(0,1,2,3,0));
 
 	String[] o1 = {"500 miliónov","50 miliónov","100 miliónov","420 miliónov"};
 	String[] o2 = {"Francúzi - 16. storočie","Talianni - 14. storčie","Francúzi - 15. storočie","Taliani - 13. storočie"};
-	String[] o3 = {"z Dunaja","z prítoku rieky Tigris","z delty indického veľtoku Ganga","z rieky Amatonka"};
+	String[] o3 = {"z Dunaja","z prítoku rieky Tigris","z delty indického veľtoku Ganga","z rieky Amazonka"};
 	String[] o4 = {"španielska učiteľka Bianca Bernardo","robotník z Talianska Fernando Gavallini","kuchár z Kansasu Abert Gitchel","identitia tohto človeka nie je známa"};
 	String[] o5 = {"horúčky, bolesť svalov a hlavy, vnútorné a vonkjašie krvácanie","horučky, silný zahlienený kašeľ, strata chuti","bolesť hrdla, horúčka, zápal pľúč","zvracane, horúčka, zápal pľúc, zvracanie"};
 
-	private ArrayList<String[]> moznosti = new ArrayList<String[]>(Arrays.asList(o1,o2,o3,o4,o5));
+	/** list of possible options **/
+	private ArrayList<String[]> options = new ArrayList<String[]>(Arrays.asList(o1,o2,o3,o4,o5));
 
-	public int pocet;
+	/** counts how many questions have already been asked **/
+	public int count;
 
-	public static final String NAME = "Game2";
+	/** saves the player's answer **/
+	private int answear;
 
-	private int odpoved;
-	//public int body;
-
+	/** create new scoreboard **/
 	private Scoreboard scoreboard = new Scoreboard();
 
+	/** turtles that display options **/
 	private Turtle a;
 	private Turtle b;
 	private Turtle c;
@@ -49,30 +55,36 @@ public class Kvíz extends Scene {
 	private Turtle C;
 	private Turtle D;
 
-	//private int skore;
-
+	/** music switch **/
 	private MusicOnOffSwitch musicOnOff;
 
+	/** back button - return you to intro scene **/
 	private BackButton backButton;
 
-	private int index = 0;
+	/** index - store random generated question **/
+	private int index;
 
+	/** file in which the resulting score is saved **/
 	private File file = new File("finalScore");
 
+	/** stores if game is running or not **/
 	private boolean isGameRunning;
 
-	private QuizQuestion currentQuestion;
-
+	/** saved image, which displays a selection of options **/
 	ImageShape virus = new ImageShape("images", "optionButton.png");
 
-	public Kvíz(Stage stage) {
+	/** constructor **/
+	public QuizGame(Stage stage) {
 		super(stage);
 		prepareScreen();
 	}
 
+	/** prepares screen **/
 	private void prepareScreen() {
 		setBorderWidth(0);
+
 		index = 0;
+
 		// paint background
 		Turtle painter = new Turtle();
 		painter.setShape(new ImageShape("images", "kv.png"));
@@ -87,25 +99,23 @@ public class Kvíz extends Scene {
 		add(question);
 		question.turn(90);
 		question.setFont(new Font("Times New Roman", Font.BOLD, 15));
-		index = (int) (Math.random() * otazky.size());
-		String ot = otazky.get(index);
+		index = (int) (Math.random() * questions.size());
+		String ot = questions.get(index);
 		question.printCenter(ot);
 		remove(question);
-		System.out.println("spravna odpoved " + odpovede.get(index));
+		System.out.println("spravna odpoved " + answears.get(index));
 
 		// option buttons
-		a = createTurtleOdpovedButton(90, 310, virus);
-		b = createTurtleOdpovedButton(90, 380, virus);
-		c = createTurtleOdpovedButton(90, 450, virus);
-		d = createTurtleOdpovedButton(90, 520, virus);
+		a = createTurtleAnswearButton(90, 310, virus);
+		b = createTurtleAnswearButton(90, 380, virus);
+		c = createTurtleAnswearButton(90, 450, virus);
+		d = createTurtleAnswearButton(90, 520, virus);
 
-		A = createTurtleOdpoved(115, 314, moznosti.get(index)[0]);
-		B = createTurtleOdpoved(115, 384, moznosti.get(index)[1]);
-		C = createTurtleOdpoved(115, 454, moznosti.get(index)[2]);
-		D = createTurtleOdpoved(115, 524, moznosti.get(index)[3]);
+		A = createTurtleAnswear(115, 314, options.get(index)[0]);
+		B = createTurtleAnswear(115, 384, options.get(index)[1]);
+		C = createTurtleAnswear(115, 454, options.get(index)[2]);
+		D = createTurtleAnswear(115, 524, options.get(index)[3]);
 
-		currentQuestion = new QuizQuestion(ot, moznosti.get(index), index);
-		System.out.print("current " + currentQuestion);
 		// create and add the music on/off switch
 		musicOnOff = new MusicOnOffSwitch(getStage());
 		musicOnOff.updateView();
@@ -128,23 +138,23 @@ public class Kvíz extends Scene {
 		isGameRunning = true;
 	}
 
-	// hra skonci ked prebehnu akekolvek 3 otazky
-	private void koniec(){
-		if (pocet == 3){
-			isGameRunning = false;
-			pocet = 0;
-			System.out.println("body");
-			System.out.println(scoreboard.getScore());
-			saveBody(file , scoreboard.getScore());
-			stopGame();
-			getStage().changeScene(Koniec.NAME, TransitionEffect.FADE_OUT_WHITE_FADE_IN, 1500);
-			return;
-		}
-	}
-
 	private void stopGame() {
 		if (!isGameRunning)
 			return;
+	}
+
+    /** the game ends after 3 questions **/
+	private void endGame(){
+		if (count == 3){
+			isGameRunning = false;
+			count = 0;
+			System.out.println("body");
+			System.out.println(scoreboard.getScore());
+			saveScore(file , scoreboard.getScore());
+			stopGame();
+			getStage().changeScene(EndScene.NAME, TransitionEffect.FADE_OUT_WHITE_FADE_IN, 1500);
+			return;
+		}
 	}
 
 	public void start() {
@@ -163,32 +173,30 @@ public class Kvíz extends Scene {
 		d.setShapeAnimation(false);
 	}
 
-	private void dalsiaOtazka(){
-		//odpovede.remove(index);
-		pocet += 1;
-		System.out.println("pocet");
-		System.out.println(pocet);
-		koniec();
+	private void nextGame(){
+		count += 1;
+		endGame();
 		prepareScreen();
 	}
 
-	private boolean spravnaOdpoved(int x, int y){
-		// spravna odpoved sa nachadza na mieste:
-		Integer ok = odpovede.get(index);
+	/** checks whether the player answered correctly **/
+	private boolean correctAnswear(int x, int y){
+		/** ok - save correct answear of current question **/
+		Integer ok = answears.get(index);
 		if (isOverA(x,y)) {
-			odpoved = 0;
+			answear = 0;
 		}
 		else if (isOverB(x,y)) {
-			odpoved = 1;
+			answear = 1;
 		}
 		else if (isOverC(x,y)) {
-			odpoved = 2;
+			answear = 2;
 		}
 		else if (isOverD(x,y)) {
-			odpoved = 3;
+			answear = 3;
 		}
 		else {System.err.println("Chybny vstup. X: " + x + "Y: " + y);}
-		if (odpoved == ok) {
+		if (answear == ok) {
 			scoreboard.increaseScore(1);
 			return true;
 		}
@@ -198,7 +206,7 @@ public class Kvíz extends Scene {
 		}
 	}
 
-	private Turtle createTurtleOdpoved(int x, int y, String odpoved) {
+	private Turtle createTurtleAnswear(int x, int y, String odpoved) {
 		Turtle turtle = new Turtle();
 		turtle.setPosition(x, y);
 		turtle.setFont(new Font("Times new Roman", Font.PLAIN, 11));
@@ -209,8 +217,7 @@ public class Kvíz extends Scene {
 		return turtle;
 	}
 
-	private Turtle createTurtleOdpovedButton(int x, int y, ImageShape virus) {
-		//ImageShape virus = new ImageShape("images", "k.png");
+	private Turtle createTurtleAnswearButton(int x, int y, ImageShape virus) {
 		Turtle turtle = new Turtle();
 		turtle.setShape(virus);
 		turtle.setPosition(x,y);
@@ -218,7 +225,7 @@ public class Kvíz extends Scene {
 		return turtle;
 	}
 
-	// vrati ci je sucastou tlacidla
+	/** verifies which option was clicked **/
 	private boolean isOverA(int x, int y) {
 		return ((int)(a.getX()) - 20 <= x) && (x <= (int)(a.getX()) + 50)
 				&& (a.getY() - 20 <= y) && (y <= a.getY() + 20);
@@ -243,32 +250,32 @@ public class Kvíz extends Scene {
 	@Override
 	protected void onMouseClicked(int x, int y, MouseEvent detail) {
 		if (detail.getButton() == MouseEvent.BUTTON1) {
-			System.out.println(pocet);
+			System.out.println(count);
 			if (isOverA(x, y)) {
 				System.out.println("ok");
-				spravnaOdpoved(x,y);
-				dalsiaOtazka();
+				correctAnswear(x,y);
+				nextGame();
 				return;
 			}
 			if (isOverB(x, y)) {
 				System.out.println("ok");
-				spravnaOdpoved(x,y);
-				dalsiaOtazka();
+				correctAnswear(x,y);
+				nextGame();
 				return;
 			}
 			if (isOverC(x, y)) {
 				System.out.println("ok");
-				spravnaOdpoved(x,y);
-				dalsiaOtazka();
+				correctAnswear(x,y);
+				nextGame();
 				return;
 			}
 			if (isOverD(x, y)) {
 				System.out.println("ok");
-				spravnaOdpoved(x,y);
-				dalsiaOtazka();
+				correctAnswear(x,y);
+				nextGame();
 				return;
 			}
-			koniec();
+			endGame();
 		}
 	}
 
@@ -277,7 +284,8 @@ public class Kvíz extends Scene {
 		return super.onCanClick(x, y) || isOverA(x, y) || isOverB(x, y) || isOverC(x, y) || isOverD(x, y);
 	}
 
-	public void saveBody(File file, int body){
+	/** save final score into file **/
+	public void saveScore(File file, int body){
 		try (PrintWriter pw = new PrintWriter(file)) {
 			pw.println(body);
 		} catch (FileNotFoundException e) {

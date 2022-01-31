@@ -6,7 +6,7 @@ import sk.upjs.jpaz2.theater.*;
 public class Pandemie extends Stage {
 
 	public Pandemie() {
-		super("Pandémie", 715, 600, new ImageShape("images", "c1.png"));
+		super("Pandémie", 715, 600, new ImageShape("images", "virusButton.png"));
 	}
 
 	@Override
@@ -18,8 +18,8 @@ public class Pandemie extends Stage {
 
 		// scenes
 		addScene(IntroScene.NAME, new IntroScene(this));
-		addScene(Kvíz.NAME, new Kvíz(this));
-		addScene(Koniec.NAME, new Koniec(this));
+		addScene(QuizGame.NAME, new QuizGame(this));
+		addScene(EndScene.NAME, new EndScene(this));
 	}
 
 	/**

@@ -1,19 +1,17 @@
 package sk.upjs.snowflakes;
 
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 import sk.upjs.jpaz2.*;
 import sk.upjs.jpaz2.theater.*;
 
 public class IntroScene extends Scene {
 
-	public static final String NAME = "Intro";
+	public static final String NAME = "IntroScene";
 
-	private Turtle zacat;
+	private Turtle start;
 
-	private Turtle skoncit;
+	private Turtle end;
 
 	private MusicOnOffSwitch musicOnOff;
 
@@ -27,26 +25,26 @@ public class IntroScene extends Scene {
 
 		// paint background
 		Turtle painter = new Turtle();
-		painter.setShape(new ImageShape("images", "pp.png"));
+		painter.setShape(new ImageShape("images", "introScene.png"));
 		add(painter);
 		painter.center();
 		painter.stamp();
 		remove(painter);
 
 		// create animated snowflakes
-		ImageShape snowflakeShape = new ImageShape("images", "c1.png");
+		ImageShape virus = new ImageShape("images", "virusButton.png");
 
-		zacat = new Turtle();
-		zacat.setShape(snowflakeShape);
-		zacat.setPosition(40, 560);
-		add(zacat);
+		start = new Turtle();
+		start.setShape(virus);
+		start.setPosition(40, 560);
+		add(start);
 
-		skoncit = new Turtle();
-		skoncit.setShape(snowflakeShape);
-		skoncit.setPosition(550, 560);
+		end = new Turtle();
+		end.setShape(virus);
+		end.setPosition(550, 560);
 		// set initial animation frame randomly
-		skoncit.setFrameIndex((int) (Math.random() * skoncit.getFrameCount()));
-		add(skoncit);
+		end.setFrameIndex((int) (Math.random() * end.getFrameCount()));
+		add(end);
 
 		// create and add the music on/off switch
 		musicOnOff = new MusicOnOffSwitch(getStage());
@@ -55,24 +53,24 @@ public class IntroScene extends Scene {
 	}
 
 	private boolean isOverSTART(int x, int y) {
-		return (zacat.getX() - 20 <= x) && (x <= zacat.getX() + 180)
-				&& (zacat.getY() - 20 <= y) && (y <= zacat.getY() + 20);
+		return (start.getX() - 20 <= x) && (x <= start.getX() + 180)
+				&& (start.getY() - 20 <= y) && (y <= start.getY() + 20);
 	}
 
 	private boolean isOverEXIT(int x, int y) {
-		return (skoncit.getX() - 20 <= x) && (x <= skoncit.getX() + 180) && (skoncit.getY() - 20 <= y)
-				&& (y <= skoncit.getY() + 20);
+		return (end.getX() - 20 <= x) && (x <= end.getX() + 180) && (end.getY() - 20 <= y)
+				&& (y <= end.getY() + 20);
 	}
 
 	public void start() {
 		musicOnOff.updateView();
-		zacat.setShapeAnimation(true);
-		skoncit.setShapeAnimation(true);
+		start.setShapeAnimation(true);
+		end.setShapeAnimation(true);
 	}
 
 	public void stop() {
-		zacat.setShapeAnimation(false);
-		skoncit.setShapeAnimation(false);
+		start.setShapeAnimation(false);
+		end.setShapeAnimation(false);
 	}
 
 	@Override
@@ -81,7 +79,7 @@ public class IntroScene extends Scene {
 		// the Pane class
 		if (detail.getButton() == MouseEvent.BUTTON1) {
 			if (isOverSTART(x, y)) {
-				getStage().changeScene(Kvíz.NAME, TransitionEffect.FADE_OUT_WHITE_FADE_IN, 1500);
+				getStage().changeScene(QuizGame.NAME, TransitionEffect.FADE_OUT_WHITE_FADE_IN, 1500);
 				return;
 			}
 
